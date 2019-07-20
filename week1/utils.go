@@ -30,6 +30,11 @@ func divide(x, y float64) (result float64, err error) {
 
 func parseInput(input string) (x float64 , y float64 , op string, err error) {
 	s := strings.Fields(input)
+	if len(s) < 3 {
+		err = fmt.Errorf("input not correct format")
+		return
+	}
+
 	op = s[1]
 
 	x, err = strconv.ParseFloat(s[0], 64)
@@ -67,6 +72,7 @@ func calc(x, y float64, op string) {
 
 	if err != nil {
 		fmt.Println(err)
+		return
 	}
 
 	fmt.Println(x, op, y, "=", result)

@@ -15,7 +15,7 @@ func main() {
 			continue
 		}
 
-		calc(x , y, op)
+		calc(x, y, op)
 	}
 	if err := scanner.Err(); err != nil {
 		fmt.Fprintln(os.Stderr, "reading standard input:", err)
