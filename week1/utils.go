@@ -6,16 +6,21 @@ import (
 	"strconv"
 )
 
-func add(x, y float64) float64 {
-	return x + y
+type Operation func (float64, float64) (float64, error)
+
+func add(x, y float64) (result float64, err error) {
+	result = x + y
+	return
 }
 
-func subtract(x, y float64) float64 {
-	return x - y
+func subtract(x, y float64) (result float64, err error) {
+	result = x - y
+	return
 }
 
-func multiply(x, y float64) float64 {
-	return x * y
+func multiply(x, y float64) (result float64, err error) {
+	result = x * y
+	return
 }
 
 func divide(x, y float64) (result float64, err error) {
@@ -24,7 +29,7 @@ func divide(x, y float64) (result float64, err error) {
 		return
 	}
 
-	result = float64(x) / float64(y)
+	result = x / y
 	return
 }
 
@@ -53,22 +58,19 @@ func parseInput(input string) (x float64 , y float64 , op string, err error) {
 }
 
 func calc(x, y float64, op string) {
-	var result float64
-	var err error
-
-	switch op {
-	case "+":
-		result = add(x, y)
-	case "-":
-		result = subtract(x, y)
-	case "*":
-		result = multiply(x, y)
-	case "/":
-		result, err = divide(x, y)
-	default:
-		fmt.Println("Operation not allowed")
-		return
+	var eval = map[string] Operation {
+		"+": add,
+		"-": subtract,
+		"*": multiply,
+		"/": divide, 
 	}
+
+	if _, ok := eval[op]; !ok {
+		fmt.Println("Operation not allowed")
+		return 
+	} 
+	
+	result, err := eval[op](x ,y)
 
 	if err != nil {
 		fmt.Println(err)
