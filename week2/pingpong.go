@@ -4,7 +4,7 @@ import(
 	"fmt"
 )
 
-func main() {
+func pingpong() {
 	var ping = make(chan int)
 	var pong = make(chan int)
 
