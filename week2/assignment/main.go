@@ -10,46 +10,70 @@ import (
 	"sync"
 )
 
-func count(filePath string, wordCount map[string]int, waitgroup *sync.WaitGroup) {
-	
-	f, err := os.Open(filePath)
+func readFileByLine(filePath string, lines chan<-string, processingFile <-chan string, wg *sync.WaitGroup) {	
+	file, err := os.Open(filePath)
 	
 	if err != nil {
 		log.Fatal(err)
 	}
+
 	defer func() {
-		f.Close();
-		waitgroup.Done()
+		file.Close();
+		
+		<- processingFile
+		if len(processingFile) == 0 {
+			close(lines)
+		}
+
+		wg.Done()
     }()
 
-	s := bufio.NewScanner(f)
-	for s.Scan() {
-		words := strings.Fields(s.Text())
-
-		for _, word := range words {			
-			wordCount[word]++
-		}			
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		lines <- scanner.Text()		
 	}
 }
 
+func countWords(lines chan string, wordCount map[string]int, wg *sync.WaitGroup)  {
+	for line := range lines {
+		words := strings.Fields(line)
+
+		for _, word := range words { 
+			wordCount[word]++
+		}
+	}
+
+	defer wg.Done()
+}
+
 func main() {
-	var waitgroup sync.WaitGroup
+	var wg sync.WaitGroup
 	path := "files"
+	
 	files, err := ioutil.ReadDir(path)
-	//done := make(chan string)
     if err != nil {
         log.Fatal(err)
 	}
 	
+	lines := make(chan string, len(files))
+	processingFile := make(chan string, len(files))
 	wordCount := make(map[string]int)
+
+	for _, file := range files {
+		processingFile <- file.Name()
+	}
 
     for _, file := range files {
 		filePath := path + "/" + file.Name()
-		waitgroup.Add(1)
-		go count(filePath, wordCount, &waitgroup)
+		wg.Add(1)
+		go readFileByLine(filePath, lines, processingFile, &wg)
 	}
+
+	wg.Add(1)
+	go countWords(lines, wordCount, &wg)
 	
-	waitgroup.Wait()
+	wg.Wait()
+
 	for key, val := range wordCount {
 		fmt.Println(key, ": ", val)
 	}
