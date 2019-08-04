@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package feedback
+
+service PassengerFeedback {
+    
+}
+
+
+message PassengerFeedback {
+    string bookingCode = 1;
+    int32 passengerID = 2;
+    string feedback = 3;
+}
