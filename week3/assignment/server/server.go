@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	port = ":50051"
+	port = ":50052"
 )
 
 type passengerFeedbackServer struct {
@@ -20,7 +20,9 @@ type passengerFeedbackServer struct {
 func (s *passengerFeedbackServer) AddFeedback(ctx context.Context, in *pb.AddFeedbackRequest) (*pb.AddFeedbackResponse, error) {
 	s.savedPassengerFeedbacks = append(s.savedPassengerFeedbacks, in.Feedback)
 
-	return nil, nil
+	return &pb.AddFeedbackResponse {
+		ResponseMessage: "Added",
+	}, nil
 }
 
 func (s *passengerFeedbackServer) GetFeedbacksByPassengerId(ctx context.Context, in *pb.FeedbacksByPassengerIdRequest) (*pb.FeedbacksByPassengerIdResponse, error) {

@@ -10,7 +10,7 @@ import (
 )
 
 const (
-	address     = "localhost:50051"
+	address     = "localhost:50052"
 )
 
 func main() {
@@ -37,4 +37,14 @@ func main() {
 	rep1, err := c.AddFeedback(ctx, &req1)
 
 	log.Printf("%s", rep1.ResponseMessage)
+
+	// Call Get feedbacks
+	req2 := pb.FeedbacksByPassengerIdRequest{
+		PassengerID: 1,
+	}
+	rep2, err := c.GetFeedbacksByPassengerId(ctx, &req2)
+
+	for _, feedback := range(rep2.PassengerFeedbacks) {
+		log.Printf("%s", feedback.Feedback)
+	}
 }
