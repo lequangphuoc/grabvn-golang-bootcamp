@@ -6,6 +6,7 @@ service PassengerFeedbackService {
     rpc AddFeedback (AddFeedbackRequest) returns (AddFeedbackResponse);
     rpc GetFeedbacksByPassengerId (FeedbacksByPassengerIdRequest) returns (FeedbacksByPassengerIdResponse);
     rpc GetFeedbacksByBookingCode (FeedbacksByBookingCodeRequest) returns (FeedbacksByBookingCodeResponse);
+    rpc DeleteByPassengerId (DeleteRequest) returns (DeleteResponse);
 }
 
 
@@ -38,3 +39,12 @@ message FeedbacksByBookingCodeRequest {
 message FeedbacksByBookingCodeResponse {
     repeated PassengerFeedback passengerFeedbacks = 1; 
 }
+
+message DeleteRequest {
+    int32 passengerID = 1;
+}
+
+message DeleteResponse {
+    bool deleted = 1;
+}
+

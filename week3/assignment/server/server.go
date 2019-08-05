@@ -14,19 +14,51 @@ const (
 )
 
 type passengerFeedbackServer struct {
-	savedPassengerFeedback []*pb.PassengerFeedback
+	savedPassengerFeedbacks []*pb.PassengerFeedback
 }
 
 func (s *passengerFeedbackServer) AddFeedback(ctx context.Context, in *pb.AddFeedbackRequest) (*pb.AddFeedbackResponse, error) {
+	s.savedPassengerFeedbacks = append(s.savedPassengerFeedbacks, in.Feedback)
+
 	return nil, nil
 }
 
 func (s *passengerFeedbackServer) GetFeedbacksByPassengerId(ctx context.Context, in *pb.FeedbacksByPassengerIdRequest) (*pb.FeedbacksByPassengerIdResponse, error) {
-	return nil, nil
+	result := []*pb.PassengerFeedback{}
+	for _, feeback := range s.savedPassengerFeedbacks {
+		if feeback.PassengerID == in.PassengerID {
+			result = append(result, feeback)
+		}
+	}
+
+	return &pb.FeedbacksByPassengerIdResponse {
+		PassengerFeedbacks: result,
+	}, nil
 }
 
 func (s *passengerFeedbackServer) GetFeedbacksByBookingCode(ctx context.Context, in *pb.FeedbacksByBookingCodeRequest) (*pb.FeedbacksByBookingCodeResponse, error) {
-	return nil, nil
+	result := []*pb.PassengerFeedback{}
+	for _, feeback := range s.savedPassengerFeedbacks {
+		if feeback.BookingCode == in.BookingCode {
+			result = append(result, feeback)
+		}
+	}
+
+	return &pb.FeedbacksByBookingCodeResponse {
+		PassengerFeedbacks: result,
+	}, nil
+}
+
+func (s *passengerFeedbackServer) DeleteByPassengerId(ctx context.Context, in *pb.DeleteRequest) (*pb.DeleteResponse, error) {
+	for i, feeback := range s.savedPassengerFeedbacks {
+		if feeback.PassengerID == in.PassengerID {
+			s.savedPassengerFeedbacks = append(s.savedPassengerFeedbacks[:i], s.savedPassengerFeedbacks[i+1:]...)
+		}
+	}
+
+	return &pb.DeleteResponse {
+		Deleted: true,
+	}, nil
 }
 
 func main() {
